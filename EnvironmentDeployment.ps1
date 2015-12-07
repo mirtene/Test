@@ -1,6 +1,6 @@
 workflow EnvironmentDeployment
 {
-
+ 
 	#Parameters
 		Param (
 			[parameter(Mandatory=$true)]
@@ -14,6 +14,9 @@ workflow EnvironmentDeployment
 
         	[parameter(Mandatory=$true)]
         	[Int]$GenAppServerCount,
+        
+        	[parameter(Mandatory=$true)]
+        	[Int]$test,
         
         	[parameter(Mandatory=$true)]
         	[Int]$GenISServerCount
