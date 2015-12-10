@@ -1,11 +1,9 @@
 workflow StartRG_VMs
-{
-	
+{	
 		#Parameters
 		Param (
 			[parameter(Mandatory=$true)]
         	[String]$vnetResourceGroup
-		
 		)
 	
 		#Authenticate Runbook to Subscription
@@ -22,33 +20,28 @@ workflow StartRG_VMs
 		if(!$ARMAccount) {
 			Throw "Could not authenticate AzureRM Account. Check username and password."
 		}
+		
 	
-	
+	InlineScript
+	{		
 	 	# Get a list of Azure VMs
-        $vmList = Get-AzureRmVM -ResourceGroupName $vnetResourceGroup 
+        $vmList = Get-AzureRmVM -ResourceGroupName $Using:vnetResourceGroup 
         Write-Output "Number of Virtual Machines found in RG: [$($vmList.Count)] Name(s): [$($vmList.name)]"
         
-        # Start all deallocated VMs in ResourceGroup
+        # Start all deallocated VMs in ResourceGroup 
         foreach($vm in $vmList)
         {    
-            $vmStatus = Get-AzureRmVM -ResourceGroupName $vm.ResourceGroupName -Name $vm.Name #-Status
+            $vmStatus = Get-AzureRmVM -ResourceGroupName $vm.ResourceGroupName -Name $vm.Name -Status
 
-       	# Start deallocated VMs
-        
-			
-		#  	if( $vmStatus.Statuses | where Code -eq "PowerState/deallocated"){
+  			if($vmStatus.Statuses | where Code -match "PowerState/deallocated")
+			  {
            	     Write-Output "Starting VM [$($vm.Name)]"
-          	      $vm | Start-AzureRmVM 
-        # 	}
-        # 	else {
-        #	        Write-Output "VM [$($vm.Name)] is already Running!"
-        # 	}
+          	     $vm | Start-AzureRmVM 
+         	}
+         	else {
+                Write-Output "VM [$($vm.Name)] is already Running!"
+         	}
      	}
-		    
-        Write-Output "All deallocated VMs now Run successfully!"
-	
-	
-	
-	
-	
+	}		    
+	Write-Output "All deallocated VMs now Run successfully!"
 }
