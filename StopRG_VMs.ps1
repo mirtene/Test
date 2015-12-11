@@ -1,13 +1,10 @@
 workflow StopRG_VMs
 {
-	
-	
-		#Parameters
-		Param (
+	#Parameters
+	Param (
 			[parameter(Mandatory=$true)]
-        	[String]$vnetResourceGroup
-		
-		)
+        	[String]$vnetResourceGroup	
+	)
 	
 	#Authenticate Runbook to Subscription
 	Write-Output "Authenticating Runbook to Subscription.."
@@ -24,29 +21,25 @@ workflow StopRG_VMs
 			Throw "Could not authenticate AzureRM Account. Check username and password."
 		}
 	
-	
-
+	InlineScript{
 	    # Get a list of Azure VMs
-        $vmList = Get-AzureRmVM -ResourceGroupName $vnetResourceGroup
+        $vmList = Get-AzureRmVM -ResourceGroupName $Using:vnetResourceGroup
         Write-Output "Number of Virtual Machines found in RG: [$($vmList.Count)] Name(s): [$($vmList.name)]"
         
         # Stop all running VMs in ResourceGroup
         foreach($vm in $vmList)
         {   
-            $vmStatus = Get-AzureRmVM -ResourceGroupName $vm.ResourceGroupName -Name $vm.Name #-Status
-
-            # Stop running VMs
-            #if($vmStatus.Statuses | where $_.Code -match "PowerState/(running|starting)")  
-            #{
+           $vmStatus = Get-AzureRmVM -ResourceGroupName $vm.ResourceGroupName -Name $vm.Name -Status
+	
+           if($vmStatus.Statuses | where Code -match "PowerState/running") 
+           {
                 Write-Output "Stopping VM [$($vm.Name)]"
                 $vm | Stop-AzureRmVM -Force
-            # }
-            #else {
-            #    Write-Output "VM [$($vm.Name)] is already deallocated!"
-            #}
+           }
+           else {
+                Write-Output "VM [$($vm.Name)] is already deallocated!"
+           }
         }
-        
-        Write-Output "All Running VMs were stopped!"
-	
-	
+	}           
+	Write-Output "All Running VMs were stopped!"	
 }
