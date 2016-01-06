@@ -35,6 +35,9 @@ workflow EnvironmentDeployment
 			Throw "Could not authenticate AzureRM Account. Check username and password."
 		}
 	
+  
+       
+
 	#If Resource Group does not exist - Create Resource Group	
 		$RG = Get-AzureRMResourceGroup | where -$ResourceGroupName -eq $vnetResourceGroup
 			if(!$RG) {
@@ -42,11 +45,23 @@ workflow EnvironmentDeployment
 				New-AzureRMResourceGroup -Name $vnetResourceGroup -Location "West Europe" -Force
 				}
 			else {
-				Throw "Resource Group already exist!"
+				Throw "Resource Group already exist!" ### Virker ikke som ønsket
 			}
+   
+		$VMAdminPassword = $adminPassword | ConvertTo-SecureString -AsPlainText -Force	
+
+	    #$keyen = 'JPkQ+tOqKDqurKPR61GHaSlKPrajPpqlrAzuE97kKJ9ZHmM0yLOU8QayTaqZWaSE6Hs9/rY8uvA+cxqau77kIw==' #'pz1hiDn6qXNy5uG8/xZDZTJrZnkjvDvT4IVhI08zV+1TqD7mArTTSNheASkjvi0qWp1N7fdYnCsaka6pQJKdCQ=='
+        $automationAccount = 'Automation1'
+		$RGName	= 'Eriksen'
+	    $key = 'registrationKey'
+		$getKey = Get-AzureRMAutomationVariable -ResourceGroupName $RGName -AutomationAccountName $automationAccount -Name $key
+		$useKey = $getkey.Value | ConvertTo-SecureString -AsPlainText -Force	
+		
+		$url = 'registrationUrl'
+		$getUrl = Get-AzureRMAutomationVariable -ResourceGroupName $RGName -AutomationAccountName $automationAccount -Name $url
+		$useUrl = $getUrl.Value 
 	
-		$VMAdminPassword = $adminPassword | ConvertTo-SecureString -AsPlainText -Force
-	
+		
 		Write-Output "Creating Genapp and GenIS Virtual Machines.."
 	
 		New-AzureRMResourceGroupDeployment `
@@ -56,10 +71,15 @@ workflow EnvironmentDeployment
 			-prefix $prefix `
 			-adminPassword $VMAdminPassword `
 			-GENAppServerCount $GenAppServerCount `
-			-GENISServerCount $GenISServerCount 
+			-GENISServerCount $GenISServerCount `
+            -registrationKey $useKey `
+            -registrationUrl $useUrl
 	
 		Write-Output "Environment Deployed!"
 
 	
 
 }
+
+
+
