@@ -44,3 +44,4 @@ workflow StopEnvironment
 		}
 	}          
 	Write-Output "All Running VMs were stopped!"
+}
