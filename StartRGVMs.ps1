@@ -1,6 +1,6 @@
 workflow StartRGVMs
 {	
-					#Parameters
+		#Parameters
 		Param (
 			[parameter(Mandatory=$true)]
         	[String]$vnetResourceGroup
