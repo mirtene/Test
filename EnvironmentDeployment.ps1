@@ -51,7 +51,7 @@ workflow EnvironmentDeployment
 		$VMAdminPassword = $adminPassword | ConvertTo-SecureString -AsPlainText -Force	
 
 	    #$keyen = 'JPkQ+tOqKDqurKPR61GHaSlKPrajPpqlrAzuE97kKJ9ZHmM0yLOU8QayTaqZWaSE6Hs9/rY8uvA+cxqau77kIw==' #'pz1hiDn6qXNy5uG8/xZDZTJrZnkjvDvT4IVhI08zV+1TqD7mArTTSNheASkjvi0qWp1N7fdYnCsaka6pQJKdCQ=='
-        $automationAccount = 'Automation1'
+        $automationAccount = 'EnvironmentAutomation'
 		$RGName	= 'Eriksen'
 	    $key = 'registrationKey'
 		$getKey = Get-AzureRMAutomationVariable -ResourceGroupName $RGName -AutomationAccountName $automationAccount -Name $key
