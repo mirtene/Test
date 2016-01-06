@@ -26,4 +26,5 @@ workflow DeleteResourceGroup
 	#Delete Resource Group	
 	Write-Output "Deleting Resource Group '$vnetResourceGroup'.."
 		Remove-AzureRMResourceGroup -Name $vnetResourceGroup -Force
+	Write-Output "Deleted Resource Group '$vnetResourceGroup'.."
 }
