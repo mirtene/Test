@@ -76,9 +76,6 @@ workflow EnvironmentDeployment
             -registrationUrl $useUrl
 	
 		Write-Output "Environment Deployed!"
-
-	
-
 }
 
 
