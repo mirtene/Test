@@ -22,7 +22,7 @@ workflow EnvironmentDeployment
 	
 	#Authenticate Runbook to Subscription
 	Write-Output "Authenticating Runbook to Subscription.."
-		$CredentialAssetName = 'CredentialAsset'
+		$CredentialAssetName = 'CredentialAssetName'
 		$Cred = GetAutomationPSCredential -Name $CredentialAssetName
 		if(!$Cred) {
 			Throw "Could not find an Automation Credential Asset named '$CredentialAssetName'. Make sure you have created one in this Automation Account."
