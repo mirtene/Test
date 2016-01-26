@@ -1,6 +1,5 @@
 workflow EnvironmentDeployment
-{
- 
+{ 
 	#Parameters
 		Param (
 			[parameter(Mandatory=$true)]
@@ -17,7 +16,6 @@ workflow EnvironmentDeployment
         
         	[parameter(Mandatory=$true)]
         	[Int]$GenISServerCount
-
 		)
 	
 	#Authenticate Runbook to Subscription
@@ -35,9 +33,6 @@ workflow EnvironmentDeployment
 			Throw "Could not authenticate AzureRM Account. Check username and password."
 		}
 	
-  
-       
-
 	#If Resource Group does not exist - Create Resource Group	
 		$RG = Get-AzureRMResourceGroup | where -$ResourceGroupName -eq $vnetResourceGroup
 			if(!$RG) {
@@ -50,12 +45,13 @@ workflow EnvironmentDeployment
    
 		$VMAdminPassword = $adminPassword | ConvertTo-SecureString -AsPlainText -Force	
 
-	    #$keyen = 'JPkQ+tOqKDqurKPR61GHaSlKPrajPpqlrAzuE97kKJ9ZHmM0yLOU8QayTaqZWaSE6Hs9/rY8uvA+cxqau77kIw==' #'pz1hiDn6qXNy5uG8/xZDZTJrZnkjvDvT4IVhI08zV+1TqD7mArTTSNheASkjvi0qWp1N7fdYnCsaka6pQJKdCQ=='
-        $automationAccount = 'EnvironmentAutomation'
+
+        $automationAccount = 'Automation1'
 		$RGName	= 'Eriksen'
 	    $key = 'registrationKey'
 		$getKey = Get-AzureRMAutomationVariable -ResourceGroupName $RGName -AutomationAccountName $automationAccount -Name $key
-		$useKey = $getkey.Value | ConvertTo-SecureString -AsPlainText -Force	
+		$useKey = $getkey.Value | ConvertTo-SecureString -AsPlainText -Force
+		Write-Output "$useKey-----"	
 		
 		$url = 'registrationUrl'
 		$getUrl = Get-AzureRMAutomationVariable -ResourceGroupName $RGName -AutomationAccountName $automationAccount -Name $url
@@ -76,7 +72,5 @@ workflow EnvironmentDeployment
             -registrationUrl $useUrl
 	
 		Write-Output "Environment Deployed!"
+
 }
-
-
-
