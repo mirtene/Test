@@ -3,7 +3,7 @@ workflow EnvironmentDeployment
 	#Parameters
 		Param (
 			[parameter(Mandatory=$true)]
-        	[String]$vnetResourceGroup,
+        	[String]$ResourceGroup,
 	
 			[parameter(Mandatory=$true)]
 			[String]$prefix,
@@ -12,10 +12,10 @@ workflow EnvironmentDeployment
         	[String]$adminPassword,
 
         	[parameter(Mandatory=$true)]
-        	[Int]$GenAppServerCount,
+        	[Int]$GenAppServers,
         
         	[parameter(Mandatory=$true)]
-        	[Int]$GenISServerCount
+        	[Int]$GenISServers
 		)
 	
 	#Authenticate Runbook to Subscription
@@ -34,10 +34,10 @@ workflow EnvironmentDeployment
 		}
 	
 	#If Resource Group does not exist - Create Resource Group	
-		$RG = Get-AzureRMResourceGroup | where -$ResourceGroupName -eq $vnetResourceGroup
+		$RG = Get-AzureRMResourceGroup | where -$ResourceGroupName -eq $ResourceGroup
 			if(!$RG) {
-				Write-Output "Creating Resource Group '$vnetResourceGroup'.."
-				New-AzureRMResourceGroup -Name $vnetResourceGroup -Location "West Europe" -Force
+				Write-Output "Creating Resource Group '$ResourceGroup'.."
+				New-AzureRMResourceGroup -Name $ResourceGroup -Location "West Europe" -Force
 				}
 			else {
 				Throw "Resource Group already exist!" ### Virker ikke som ønsket
@@ -46,7 +46,7 @@ workflow EnvironmentDeployment
 		$VMAdminPassword = $adminPassword | ConvertTo-SecureString -AsPlainText -Force	
 
 
-        $automationAccount = 'Automation1'
+        $automationAccount = 'EnvironmentDeployment'
 		$RGName	= 'Eriksen'
 	    $key = 'registrationKey'
 		$getKey = Get-AzureRMAutomationVariable -ResourceGroupName $RGName -AutomationAccountName $automationAccount -Name $key
@@ -62,12 +62,12 @@ workflow EnvironmentDeployment
 	
 		New-AzureRMResourceGroupDeployment `
 			-Name "Deployment" `
-			-ResourceGroupName $vnetResourceGroup `
+			-ResourceGroupName $ResourceGroup `
 			-TemplateUri "https://meriksstorage.blob.core.windows.net/public/InvoicingExample2.json" `
 			-prefix $prefix `
 			-adminPassword $VMAdminPassword `
-			-GENAppServerCount $GenAppServerCount `
-			-GENISServerCount $GenISServerCount `
+			-GENAppServerCount $GenAppServers `
+			-GENISServerCount $GenISServers `
             -registrationKey $useKey `
             -registrationUrl $useUrl
 	
