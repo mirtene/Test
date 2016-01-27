@@ -42,35 +42,22 @@ workflow EnvironmentDeployment
 			else {
 				Throw "Resource Group already exist!" ### Virker ikke som ønsket
 			}
-   
-		$VMAdminPassword = $adminPassword | ConvertTo-SecureString -AsPlainText -Force	
 
-
-        $automationAccount = 'EnvironmentDeployment'
-		$RGName	= 'Eriksen'
-	    $key = 'registrationKey'
-		$getKey = Get-AzureRMAutomationVariable -ResourceGroupName $RGName -AutomationAccountName $automationAccount -Name $key
-		$useKey = $getkey.Value | ConvertTo-SecureString -AsPlainText -Force
-		Write-Output "$useKey-----"	
-		
-		$url = 'registrationUrl'
-		$getUrl = Get-AzureRMAutomationVariable -ResourceGroupName $RGName -AutomationAccountName $automationAccount -Name $url
-		$useUrl = $getUrl.Value 
+	$templateUri = "https://meriksstorage.blob.core.windows.net/public/InvoicingExample2.json"
+	$useUrl = (Get-AutomationVariable -Name "regUrl").ToString()
+	$useKey = (Get-AutomationVariable -Name "regKey").ToString()
 	
-		
-		Write-Output "Creating Genapp and GenIS Virtual Machines.."
+	$params= @{
+            prefix = $prefix 
+			adminPassword = $adminPassword 
+			GENAppServerCount = $GenAppServers 
+			GENISServerCount = $GenISServers 
+            registrationKey = $useKey 
+            registrationUrl = $useUrl
+     }
 	
-		New-AzureRMResourceGroupDeployment `
-			-Name "Deployment" `
-			-ResourceGroupName $ResourceGroup `
-			-TemplateUri "https://meriksstorage.blob.core.windows.net/public/InvoicingExample2.json" `
-			-prefix $prefix `
-			-adminPassword $VMAdminPassword `
-			-GENAppServerCount $GenAppServers `
-			-GENISServerCount $GenISServers `
-            -registrationKey $useKey `
-            -registrationUrl $useUrl
-	
-		Write-Output "Environment Deployed!"
+	Write-Output "Creating Genapp and GenIS Virtual Machines.."
+	New-AzureRMResourceGroupDeployment -Name $prefix -ResourceGroupName $ResourceGroup -TemplateUri $templateUri -TemplateParameterObject $params
+	Write-Output "Environment Deployed!"
 
 }
