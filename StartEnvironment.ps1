@@ -3,7 +3,7 @@ workflow StartEnvironment
 		#Parameters
 		Param (
 			[parameter(Mandatory=$true)]
-        	[String]$vnetResourceGroup
+        	[String]$ResourceGroup
 		)
 	
 		#Authenticate Runbook to Subscription
@@ -17,12 +17,10 @@ workflow StartEnvironment
 		#Connect to AzureRM Account
 		Write-Output "Connecting to AzureRM Account.."
 		$ARMAccount = Login-AzureRMAccount -Credential $Cred
-		if(!$ARMAccount) {
-			Throw "Could not authenticate AzureRM Account. Check username and password."
-		}
+		
 		
 	# Get a list of Azure VMs
-	$vmList = Get-AzureRmVM -ResourceGroupName $Using:vnetResourceGroup 
+	$vmList = Get-AzureRmVM -ResourceGroupName $ResourceGroup 
     Write-Output "Number of Virtual Machines found in RG: [$($vmList.Count)] Name(s): [$($vmList.name)]"
 	foreach -parallel($inlineVm in $vmList)
     {    	
