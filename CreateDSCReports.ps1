@@ -84,23 +84,13 @@ workflow CreateDSCReports
 	                  position: relative;
 	                  transition: all 300ms;
 	                }"
-	    $a += "ul {
-	                  list-style-type: disc;
-	                }"
-	    $a += "ul > li a {
-	                  color: green;
-	                }"
-	    $a += "ul > li b {
-	                  color: red;
-	                }"
-	    $a += "ul > li > span {
-	                  color: black;
-	                }"
-	    $a += "tr#COMPLIANT { 
-	                  background: linear-gradient(white, white, white, white, green, white); 
+	   $a += "tr#COMPLIANT { 
+	                 
+	                  color: green;  
 	                }"
 	    $a += "tr#NOTCOMPLIANT { 
-	                  background: linear-gradient(white, white, white, white, red, white);  
+	                
+	                  color: red;   
 	                }"
 	    $a += "</style>"
 	    
@@ -149,8 +139,8 @@ workflow CreateDSCReports
 		            $getNodeConfigName = $getNodeInfo.NodeConfigurationName
 		            
 		            #get nodes and export reports for each node	
-		            $getLatestReports = Get-AzureRmAutomationDscNodeReport -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -NodeId $getNodeInfo.Id -StartTime "2016-01-27T12:00:00.0000000" #latest
-		            $report = $getLatestReports[-1]
+		            $report = Get-AzureRmAutomationDscNodeReport -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -NodeId $getNodeInfo.Id -Latest #-StartTime "2016-01-27T12:00:00.0000000" 
+		            #$report = $getLatestReports[-1]
 					
 					$tempPath = [System.IO.Path]::GetTempPath()
 		            $expReport = Export-AzureRmAutomationDscNodeReportContent -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -NodeId $getNodeInfo.Id -ReportId $report.Id -OutputFolder $tempPath -Force
@@ -204,7 +194,7 @@ workflow CreateDSCReports
     $BlobName = "DSCReports.html" 
     $htmlFileName = "DSCReports.html" 
     
-    
+    #connect to azure storage blob and create a context 
     $Account = Get-AzureRmStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName -ErrorAction:Stop
     $StorageAccountKey = ($Account | Get-AzureRmStorageAccountKey).Key1
     $Context  = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageAccountKey
@@ -220,8 +210,33 @@ workflow CreateDSCReports
     New-Item -Path $htmlFileName -Value $html -ItemType File -Force 
 
     # Upload the file contents 
-    Set-AzureStorageBlobContent -Blob $blobName -Container $containerName -File $htmlFileName -BlobType Block -Context $Context -Force
+    Set-AzureStorageBlobContent -Blob $BlobName -Container $ContainerName -File $htmlFileName -BlobType Block -Context $Context -Force
+        
 
+        # Config
+        $Username = "dscreportstellier\dscreportscred"
+        $Password = "@zur3@dm1n"
+        $LocalFile = $htmlFileName 
+        $RemoteFile = "ftp://waws-prod-am2-053.ftp.azurewebsites.windows.net/site/wwwroot/hostingstart.html"
+
+		# Create FTP Rquest Object
+		$FTPRequest = [System.Net.FtpWebRequest]::Create("$RemoteFile")
+		$FTPRequest = [System.Net.FtpWebRequest]$FTPRequest
+		$FTPRequest.Method = [System.Net.WebRequestMethods+Ftp]::UploadFile
+		$FTPRequest.Credentials = new-object System.Net.NetworkCredential($Username, $Password)
+		$FTPRequest.UseBinary = $true
+		$FTPRequest.UsePassive = $true
+		# Read the File for Upload
+		$FileContent = gc -en byte $LocalFile
+		$FTPRequest.ContentLength = $FileContent.Length
+		# Get Stream Request by bytes
+		$Run = $FTPRequest.GetRequestStream()
+		$Run.Write($FileContent, 0, $FileContent.Length)
+		# Cleanup
+		$Run.Close()
+		$Run.Dispose()
+
+     
 
 }#end InlineScript
  
