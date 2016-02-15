@@ -139,8 +139,8 @@ workflow CreateDSCReports
 		            $getNodeConfigName = $getNodeInfo.NodeConfigurationName
 		            
 		            #get nodes and export reports for each node	
-		            $report = Get-AzureRmAutomationDscNodeReport -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -NodeId $getNodeInfo.Id -Latest #-StartTime "2016-01-27T12:00:00.0000000" 
-		            #$report = $getLatestReports[-1]
+		            $report = Get-AzureRmAutomationDscNodeReport -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -NodeId $getNodeInfo.Id -Latest 
+		           
 					
 					$tempPath = [System.IO.Path]::GetTempPath()
 		            $expReport = Export-AzureRmAutomationDscNodeReportContent -ResourceGroupName $ResourceGroupName -AutomationAccountName $AutomationAccountName -NodeId $getNodeInfo.Id -ReportId $report.Id -OutputFolder $tempPath -Force
@@ -187,7 +187,7 @@ workflow CreateDSCReports
 		                }
 			        }  
 				}# end function 
-    
+    #report variables
     $reportTime = Get-Date
     $StorageAccountName = "meriksstorage"
     $ContainerName = "html"
@@ -209,7 +209,7 @@ workflow CreateDSCReports
     #generateHTMLfile
     New-Item -Path $htmlFileName -Value $html -ItemType File -Force 
 
-    # Upload the file contents 
+    # Upload the file contents  to Azure Storage
     Set-AzureStorageBlobContent -Blob $BlobName -Container $ContainerName -File $htmlFileName -BlobType Block -Context $Context -Force
         
 
