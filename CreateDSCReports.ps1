@@ -214,7 +214,7 @@ workflow CreateDSCReports
         
 
         # Config
-        $Username = "dscreportstellier\dscreportscred"
+        $Username = "dscreportstellier\vmreportscred"
         $Password = "@zur3@dm1n"
         $LocalFile = $htmlFileName 
         $RemoteFile = "ftp://waws-prod-am2-053.ftp.azurewebsites.windows.net/site/wwwroot/hostingstart.html"
