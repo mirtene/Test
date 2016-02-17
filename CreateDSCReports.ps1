@@ -84,6 +84,7 @@ workflow CreateDSCReports
 	                  position: relative;
 	                  transition: all 300ms;
 	                }"
+						<#
 	   $a += "tr#COMPLIANT { 
 	                 
 	                  color: green;  
@@ -92,6 +93,7 @@ workflow CreateDSCReports
 	                
 	                  color: red;   
 	                }"
+						#>
 	    $a += "</style>"
 	    
 	    #table headers
@@ -163,11 +165,11 @@ workflow CreateDSCReports
 	                                $vmResourceGroupName = ($allVMs | where Servername -eq $nodeName).ResourceGroup
 	                                if ($html.Contains($nodeName))
 	                                {
-	                                    $Script:html += ("<tr ID={6}><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td><ul><li><span>{5}</span></li></ul></td></tr>" -f "","","","","",$compliantNodeInfo,"COMPLIANT")
+	                                    $Script:html += ("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td><ul><li><font color='green'>{5}</font></li></ul></td></tr>" -f "","","","","",$compliantNodeInfo)
 	                                }
 	                                else
 	                                {
-	                                    $Script:html += ("<tr ID={6}><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td><ul><li><span>{5}</span></li></ul></td></tr>" -f $getNodeConfigName,$nodeName,$vmResourceGroupName,$getNodeStatus,$getReportTime,$compliantNodeInfo,"COMPLIANT")
+	                                    $Script:html += ("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td><ul><li><font color='green'>{5}</font></li></ul></td></tr>" -f $getNodeConfigName,$nodeName,$vmResourceGroupName,$getNodeStatus,$getReportTime,$compliantNodeInfo)
 	                                }    
 	                        }
 	                        foreach($status in $statusData.ResourcesNotInDesiredState)
@@ -176,11 +178,11 @@ workflow CreateDSCReports
                                 $vmResourceGroupName = ($allVMs | where Servername -eq $nodeName).ResourceGroup
                                 if ($html.Contains($nodeName))
                                 {
-                                    $Script:html += ("<tr ID={6}><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td><ul><li><span>{5}</span></li></td></tr>" -f "","","","","",$notCompliantNodeInfo,"NOTCOMPLIANT")
+                                    $Script:html += ("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td><ul><li><font color='red'>{5}</font></li></td></tr>" -f "","","","","",$notCompliantNodeInfo)
                                 }
                                 else
                                 {
-                                	$Script:html += ("<tr ID={6}><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td><ul><li><span>{5}</span></li></ul></td></tr>" -f $getNodeConfigName,$nodeName,$vmResourceGroupName,$getNodeStatus,$getReportTime,$notCompliantNodeInfo,"NOTCOMPLIANT")
+                                	$Script:html += ("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td><ul><li><font color='red'>{5}</font></li></ul></td></tr>" -f $getNodeConfigName,$nodeName,$vmResourceGroupName,$getNodeStatus,$getReportTime,$notCompliantNodeInfo)
 	                            }    
 		                        }      
 		                    }
