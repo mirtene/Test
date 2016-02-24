@@ -32,7 +32,7 @@ workflow CreateVMReports
 	                    line-height: 24px;
 	                    margin: 30px auto;
 	                    text-align: left;
-	                    width: 1300px;
+	                    width: 950px;
 	                }"
 	    $a += "th {
 	                  background: url(http://jackrugile.com/images/misc/noise-diagonal.png), linear-gradient(#777, #444);
