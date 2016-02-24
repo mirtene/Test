@@ -109,13 +109,18 @@ workflow CreateUniqueVMReports
 	        }#End Function: Report 
 		
         #for each RG: call "Report" function, create HTML report file for this RG and push to webapp 
-        $getRGs = Get-AzureRmResourceGroup | select ResourceGroupName 
+       
+	   	$WebAppCredName = Get-AutomationPSCredential -Name 'WebAppCredential'
+		$WebAppPath = Get-AutomationVariable -Name 'WebAppFileLocation'
+	   
+	    $getRGs = Get-AzureRmResourceGroup | select ResourceGroupName 
         foreach($rg in $getRGs)
 	    {	
             $rgName = $rg.ResourceGroupName
 			$htmlFileName = "$($rgName).html"
-       	 	$reportTime = Get-Date
-				
+       	 	$WebAppFileLocation = "$($WebAppPath)$($htmlFileName)"
+			$reportTime = Get-Date
+			
             if ($rgName -like "test*"){
                 $html = ""
                 #call function with RG Name as input
@@ -127,17 +132,11 @@ workflow CreateUniqueVMReports
                 #generateHTMLfile in tempStorage
                 New-Item -Path $htmlFileName -Value $html -ItemType File -Force 
 
-                # Config
-				$WebAppCredName = 'WebAppCredential'
-				$Credential = Get-AutomationPSCredential -Name $WebAppCredName
-				$WebAppPath = Get-AutomationVariable -Name 'WebAppFileLocation'
-                $WebAppFileLocation = "$($WebAppPath)$($htmlFileName)"
-
                 # Create FTP Rquest Object
                 $FTPRequest = [System.Net.FtpWebRequest]::Create("$WebAppFileLocation")
                 $FTPRequest = [System.Net.FtpWebRequest]$FTPRequest
                 $FTPRequest.Method = [System.Net.WebRequestMethods+Ftp]::UploadFile
-                $FTPRequest.Credentials = new-object System.Net.NetworkCredential($Credential.Username , $Credential.Password)
+                $FTPRequest.Credentials = new-object System.Net.NetworkCredential($WebAppCredName.Username , $WebAppCredName.Password)
                 $FTPRequest.UseBinary = $true
                 $FTPRequest.UsePassive = $true
                 # Read the File for Upload
